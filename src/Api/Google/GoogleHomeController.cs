@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Dapper;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Rtsp.Cameras;
 
 namespace Rtsp.Google
 {
@@ -29,37 +29,36 @@ namespace Rtsp.Google
 		/// </remarks>
 		[HttpPost]
 		[GoogleAction("action.devices.SYNC")]
-		public ActionResult Sync(SyncAction action)
+		public async Task<ActionResult> Sync(SyncAction action)
 		{
 			log.LogDebug("Receiving sync action {requestId}", action.RequestId);
 
-			throw new NotImplementedException();
-			//var cameras = opts.Cameras.Select(c => new
-			//{
-			//	c.Id,
-			//	Type = "action.devices.types.CAMERA",
-			//	Traits = new string[] { "action.devices.traits.CameraStream" },
+			var cameras = (await db.SelectCameras()).Select(c => new
+			{
+				c.Id,
+				Type = "action.devices.types.CAMERA",
+				Traits = new string[] { "action.devices.traits.CameraStream" },
 
-			//	Name = new { c.Name },
-			//	WillReportState = false,
+				Name = new { c.Name, c.NickNames },
+				WillReportState = false,
 
-			//	Attributes = new
-			//	{
-			//		CameraStreamSupportedProtocols = new string[] { "hls" },
-			//		CameraStreamNeedAuthToken = false,
-			//		CameraStreamNeedDrmEncryption = false
-			//	}
-			//});
+				Attributes = new
+				{
+					CameraStreamSupportedProtocols = new string[] { "hls" },
+					CameraStreamNeedAuthToken = false,
+					CameraStreamNeedDrmEncryption = false
+				}
+			});
 
-			//return Ok(new
-			//{
-			//	action.RequestId,
-			//	Payload = new
-			//	{
-			//		AgentUserId,
-			//		Devices = cameras
-			//	}
-			//});
+			return Ok(new
+			{
+				action.RequestId,
+				Payload = new
+				{
+					AgentUserId,
+					Devices = cameras
+				}
+			});
 		}
 
 		/// <remarks>
@@ -67,7 +66,7 @@ namespace Rtsp.Google
 		/// </remarks>
 		[HttpPost]
 		[GoogleAction("action.devices.EXECUTE")]
-		public ActionResult GetCameraStream(ExecuteAction action)
+		public async Task<ActionResult> GetCameraStream(ExecuteAction action)
 		{
 			log.LogDebug("Receiving execute action {requestId}", action.RequestId);
 
@@ -77,30 +76,30 @@ namespace Rtsp.Google
 
 			string deviceId = action?.Inputs?.FirstOrDefault()?.Payload?.Commands?.FirstOrDefault()?.Devices?.FirstOrDefault().Id;
 
-			throw new NotImplementedException();
-			//var cam = opts.Cameras.FirstOrDefault(c => c.Id == deviceId);
-			//if (cam == null)
-			//	return NotFound();
+			var cam = await db.SelectCamera(deviceId);
+			if (cam == null)
+				return NotFound();
 
-			//return Ok(new
-			//{
-			//	action.RequestId,
-			//	Payload = new
-			//	{
-			//		Commands = new[]
-			//		{
-			//			new
-			//			{
-			//				Ids = new[] { deviceId },
-			//				Status = "SUCCESS",
-			//				States = new
-			//				{
-			//					CameraStreamAccessUrl=$"{opts.LocalNetworkUrl}{cam.Name}/master.m3u8"
-			//				}
-			//			}
-			//		}
-			//	}
-			//});
+			return Ok(new
+			{
+				action.RequestId,
+				Payload = new
+				{
+					Commands = new[]
+					{
+						new
+						{
+							Ids = new[] { deviceId },
+							Status = "SUCCESS",
+							States = new
+							{
+								// TODO: get local network URL from database as well
+								CameraStreamAccessUrl=$"http://media.home:5000/{cam.Name}/master.m3u8"
+							}
+						}
+					}
+				}
+			});
 		}
 
 		/// <remarks>
@@ -108,24 +107,25 @@ namespace Rtsp.Google
 		/// </remarks>
 		[HttpPost]
 		[GoogleAction("action.devices.QUERY")]
-		public ActionResult QueryDevices(QueryAction action)
+		public async Task<ActionResult> QueryDevices(QueryAction action)
 		{
 			log.LogDebug("Receiving query action {requestId}", action.RequestId);
 
-			throw new NotImplementedException();
-			//var devices = action.Inputs.SelectMany(i => i.Payload.Devices).Aggregate(new Dictionary<string, QueryDeviceResult>(), (dic, d) =>
-			//{
-			//	if (opts.Cameras.Any(c => c.Id == d.Id))
-			//		dic.Add(d.Id, new QueryDeviceResult { Online = true });
+			var cameras = await db.SelectCameras();
 
-			//	return dic;
-			//});
+			var devices = action.Inputs.SelectMany(i => i.Payload.Devices).Aggregate(new Dictionary<string, QueryDeviceResult>(), (dic, d) =>
+			{
+				if (cameras.Any(c => c.Id == d.Id))
+					dic.Add(d.Id, new QueryDeviceResult { Online = true });
 
-			//return Ok(new
-			//{
-			//	action.RequestId,
-			//	Payload = new { devices }
-			//});
+				return dic;
+			});
+
+			return Ok(new
+			{
+				action.RequestId,
+				Payload = new { devices }
+			});
 		}
 	}
 }
