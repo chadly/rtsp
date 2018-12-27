@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AssemblyName>stream-cams</AssemblyName>
+    <RootNamespace>Rtsp.Streaming</RootNamespace>
+    <Version>1.0.0</Version>
+    <Authors>Chad Lee</Authors>
+    <Company />
+    <Product>RTSP Camera Streaming</Product>
+    <Description>Convert RTSP camera streams to HLS for consumption by chromecast or other web video players.</Description>
+    <Copyright>Chad Lee</Copyright>
+    <PackageLicenseUrl>https://github.com/chadly/rtsp/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/chadly/rtsp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/chadly/rtsp.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Nito.AsyncEx" Version="5.0.0-pre-05" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Client\Client.csproj" />
+  </ItemGroup>
+
+</Project>

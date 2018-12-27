@@ -1,0 +1,3 @@
+{
+  "db": "server=.;database=rtsp_tests;integrated security=true;"
+}

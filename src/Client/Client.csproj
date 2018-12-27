@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Rtsp.Client</AssemblyName>
+    <RootNamespace>Rtsp</RootNamespace>
+    <Version>1.0.0</Version>
+    <Authors>Chad Lee</Authors>
+    <Company />
+    <Product>RTSP Camera Streaming</Product>
+    <Description>Convert RTSP camera streams to HLS for consumption by chromecast or other web video players.</Description>
+    <Copyright>Chad Lee</Copyright>
+    <PackageLicenseUrl>https://github.com/chadly/rtsp/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/chadly/rtsp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/chadly/rtsp.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Archon.Http" Version="3.2.0" />
+  </ItemGroup>
+</Project>
