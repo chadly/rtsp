@@ -1,0 +1,19 @@
+version: 1.0.{build}
+skip_tags: true
+skip_branch_with_pr: true
+image: Visual Studio 2017
+configuration: Release
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+services: mssql2017
+before_build:
+- pwsh: dotnet restore
+build:
+  publish_aspnet_core: true
+  verbosity: minimal
