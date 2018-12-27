@@ -4,3 +4,4 @@ obj
 .vscode
 *.user
 PublishProfiles
+appsettings.development.json
