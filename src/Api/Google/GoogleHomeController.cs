@@ -94,7 +94,7 @@ namespace Rtsp.Google
 							States = new
 							{
 								// TODO: get local network URL from database as well
-								CameraStreamAccessUrl=$"http://media.home:5000/{cam.Name}/master.m3u8"
+								CameraStreamAccessUrl=$"http://media.home:5000/{cam.Id}/master.m3u8"
 							}
 						}
 					}
