@@ -7,7 +7,7 @@ namespace Rtsp
 		public string Id { get; set; }
 		public string Name { get; set; }
 
-		public IEnumerable<string> NickNames { get; set; }
+		public IEnumerable<string> Nicknames { get; set; }
 
 		public string RtspUrl { get; set; }
 	}

@@ -39,7 +39,7 @@ namespace Rtsp.Google
 				Type = "action.devices.types.CAMERA",
 				Traits = new string[] { "action.devices.traits.CameraStream" },
 
-				Name = new { c.Name, c.NickNames },
+				Name = new { c.Name, c.Nicknames },
 				WillReportState = false,
 
 				Attributes = new

@@ -12,8 +12,8 @@ namespace Rtsp.Cameras
 		[Required]
 		public string Name { get; set; }
 
-		public IEnumerable<string> NickNames { get; set; }
-		public string NickNamesJson => NickNames == null ? null : JsonConvert.SerializeObject(NickNames);
+		public IEnumerable<string> Nicknames { get; set; }
+		public string NicknamesJson => Nicknames == null ? null : JsonConvert.SerializeObject(Nicknames);
 
 		[Required]
 		public string RtspUrl { get; set; }

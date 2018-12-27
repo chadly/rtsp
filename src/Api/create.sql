@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[Camera](
 	[CameraId] [varchar](25) NOT NULL,
 	[Name] [varchar](150) NOT NULL,
-	[NickNames] [varchar](500) NULL,
+	[Nicknames] [varchar](500) NULL,
 	[RtspUrl] [varchar](500) NULL,
 	[CreatedAt] [datetime] not null default getutcdate(),
  CONSTRAINT [PK_Camera] PRIMARY KEY CLUSTERED 

@@ -10,9 +10,9 @@ namespace Rtsp.Cameras
 		public string Name { get; set; }
 
 		[JsonIgnore]
-		public string NickNamesJson { get; set; }
+		public string NicknamesJson { get; set; }
 
-		public IEnumerable<string> NickNames => String.IsNullOrWhiteSpace(NickNamesJson) ? new string[0] : JsonConvert.DeserializeObject<IEnumerable<string>>(NickNamesJson);
+		public IEnumerable<string> Nicknames => String.IsNullOrWhiteSpace(NicknamesJson) ? new string[0] : JsonConvert.DeserializeObject<IEnumerable<string>>(NicknamesJson);
 
 		public string RtspUrl { get; set; }
 

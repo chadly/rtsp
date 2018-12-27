@@ -34,7 +34,7 @@ namespace Rtsp.Tests.Scenarios
 			{
 				Id = "cam1",
 				Name = "Front Yard",
-				NickNames = new string[0],
+				Nicknames = new string[0],
 				RtspUrl = "rtsp://example.com/front"
 			});
 		}

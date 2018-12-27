@@ -11,7 +11,7 @@ namespace Rtsp.Cameras
 			select
 				CameraId as Id,
 				Name,
-				NickNames as NickNamesJson,
+				Nicknames as NicknamesJson,
 				RtspUrl,
 				CreatedAt
 			from
@@ -20,7 +20,7 @@ namespace Rtsp.Cameras
 		public static Task InsertCamera(this IDbConnection db, NewCamera camera)
 		{
 			return db.ExecuteAsync(@"insert into Camera (CameraId, Name, NickNames, RtspUrl)
-				values (@id, @name, @nickNamesJson, @rtspUrl)",
+				values (@id, @name, @nicknamesJson, @rtspUrl)",
 				camera
 			);
 		}
