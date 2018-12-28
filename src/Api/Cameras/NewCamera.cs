@@ -1,21 +1,26 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace Rtsp.Cameras
 {
 	public class NewCamera
 	{
-		[Required]
-		public string Id { get; set; }
+		string name, rtspUrl;
 
 		[Required]
-		public string Name { get; set; }
-
-		public IEnumerable<string> Nicknames { get; set; }
-		public string NicknamesJson => Nicknames == null ? null : JsonConvert.SerializeObject(Nicknames);
+		[MaxLength(50)]
+		public string Name
+		{
+			get => name;
+			set => name = value?.Trim();
+		}
 
 		[Required]
-		public string RtspUrl { get; set; }
+		[MaxLength(250)]
+		public string RtspUrl
+		{
+			get => rtspUrl;
+			set => rtspUrl = value?.Trim();
+		}
 	}
 }

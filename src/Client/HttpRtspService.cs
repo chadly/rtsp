@@ -24,7 +24,7 @@ namespace Rtsp
 			return await response.Content.ReadJsonAsync<IEnumerable<Camera>>();
 		}
 
-		public async Task<Camera> GetCamera(string id)
+		public async Task<Camera> GetCamera(int id)
 		{
 			var response = await api.GetAsync($"/cameras/{id}");
 
@@ -35,9 +35,9 @@ namespace Rtsp
 			return await response.Content.ReadJsonAsync<Camera>();
 		}
 
-		public async Task<Camera> AddCamera(Camera camera)
+		public async Task<Camera> AddCamera(string name, string rtspUrl)
 		{
-			string json = JsonConvert.SerializeObject(camera);
+			string json = JsonConvert.SerializeObject(new { name, rtspUrl });
 			var content = new StringContent(json, Encoding.UTF8, "application/json");
 
 			var response = await api.PostAsync("/cameras/", content);
@@ -45,7 +45,7 @@ namespace Rtsp
 			return await response.Content.ReadJsonAsync<Camera>();
 		}
 
-		public async Task RemoveCamera(string id)
+		public async Task RemoveCamera(int id)
 		{
 			var response = await api.DeleteAsync($"/cameras/{id}");
 

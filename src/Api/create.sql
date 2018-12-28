@@ -1,12 +1,15 @@
 CREATE TABLE [dbo].[Camera](
-	[CameraId] [varchar](25) NOT NULL,
-	[Name] [varchar](150) NOT NULL,
-	[Nicknames] [varchar](500) NULL,
-	[RtspUrl] [varchar](500) NULL,
+	[CameraId] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar](50) NOT NULL,
+	[RtspUrl] [varchar](250) NOT NULL,
 	[CreatedAt] [datetime] not null default getutcdate(),
  CONSTRAINT [PK_Camera] PRIMARY KEY CLUSTERED 
 (
 	[CameraId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+)WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY],
+ CONSTRAINT [UQ_Camera_Name] UNIQUE NONCLUSTERED 
+(
+	[Name] ASC
+)WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO

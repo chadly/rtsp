@@ -8,6 +8,8 @@ namespace Rtsp.Tests.Scenarios
 {
 	public class Removing_a_camera : IntegrationTest
 	{
+		int camera1Id, camera2Id;
+
 		public Removing_a_camera(DatabaseFixture fixture)
 			   : base(fixture) { }
 
@@ -15,36 +17,25 @@ namespace Rtsp.Tests.Scenarios
 		{
 			await base.InitializeAsync();
 
-			await api.AddCamera(new Camera
-			{
-				Id = "cam1",
-				Name = "Front Yard",
-				RtspUrl = "rtsp://example.com/front"
-			});
-
-			await api.AddCamera(new Camera
-			{
-				Id = "cam2",
-				Name = "Backyard",
-				RtspUrl = "rtsp://example.com/back"
-			});
+			camera1Id = (await api.AddCamera("Front Yard", "rtsp://example.com/front")).Id;
+			camera2Id = (await api.AddCamera("Backyard", "rtsp://example.com/back")).Id;
 		}
 
 		[Fact]
 		public async Task Remove_a_camera()
 		{
-			await api.RemoveCamera("cam1");
+			await api.RemoveCamera(camera1Id);
 			response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
 			var cameras = await api.GetCameras();
 			cameras.Should().HaveCount(1);
-			cameras.Select(c => c.Id).Should().NotContain("cam1");
+			cameras.Select(c => c.Id).Should().NotContain(camera1Id);
 		}
 
 		[Fact]
 		public async Task Remove_a_camera_that_does_not_exist()
 		{
-			await api.RemoveCamera("cam69");
+			await api.RemoveCamera(23948723);
 			response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 		}
 	}

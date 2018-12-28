@@ -7,6 +7,8 @@ namespace Rtsp.Tests.Scenarios
 {
 	public class Getting_a_camera : IntegrationTest
 	{
+		int cameraId;
+
 		public Getting_a_camera(DatabaseFixture fixture)
 			   : base(fixture) { }
 
@@ -14,35 +16,28 @@ namespace Rtsp.Tests.Scenarios
 		{
 			await base.InitializeAsync();
 
-			await api.AddCamera(new Camera
-			{
-				Id = "cam1",
-				Name = "Front Yard",
-				RtspUrl = "rtsp://example.com/front"
-			});
+			cameraId = (await api.AddCamera("Front Yard", "rtsp://example.com/front")).Id;
 		}
 
 		[Fact]
 		public async Task Get_camera()
 		{
-			var result = await api.GetCamera("cam1");
+			var result = await api.GetCamera(cameraId);
 
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
 
 			result.Should().NotBeNull();
 			result.Should().BeEquivalentTo(new Camera
 			{
-				Id = "cam1",
 				Name = "Front Yard",
-				Nicknames = new string[0],
 				RtspUrl = "rtsp://example.com/front"
-			});
+			}, opts => opts.Including(c => c.Name).Including(c => c.RtspUrl));
 		}
 
 		[Fact]
 		public async Task Get_camera_that_does_not_exist()
 		{
-			var result = await api.GetCamera("cam2");
+			var result = await api.GetCamera(48482387);
 
 			response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 

@@ -35,11 +35,11 @@ namespace Rtsp.Google
 
 			var cameras = (await db.SelectCameras()).Select(c => new
 			{
-				c.Id,
+				Id = c.Id.ToString(),
 				Type = "action.devices.types.CAMERA",
 				Traits = new string[] { "action.devices.traits.CameraStream" },
 
-				Name = new { c.Name, c.Nicknames },
+				Name = new { c.Name },
 				WillReportState = false,
 
 				Attributes = new
@@ -76,7 +76,10 @@ namespace Rtsp.Google
 
 			string deviceId = action?.Inputs?.FirstOrDefault()?.Payload?.Commands?.FirstOrDefault()?.Devices?.FirstOrDefault().Id;
 
-			var cam = await db.SelectCamera(deviceId);
+			if (!int.TryParse(deviceId, out int cameraId))
+				return NotFound();
+
+			var cam = await db.SelectCamera(cameraId);
 			if (cam == null)
 				return NotFound();
 
@@ -115,7 +118,7 @@ namespace Rtsp.Google
 
 			var devices = action.Inputs.SelectMany(i => i.Payload.Devices).Aggregate(new Dictionary<string, QueryDeviceResult>(), (dic, d) =>
 			{
-				if (cameras.Any(c => c.Id == d.Id))
+				if (int.TryParse(d.Id, out int cameraId) && cameras.Any(c => c.Id == cameraId))
 					dic.Add(d.Id, new QueryDeviceResult { Online = true });
 
 				return dic;

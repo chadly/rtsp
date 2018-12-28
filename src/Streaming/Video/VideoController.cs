@@ -20,10 +20,10 @@ namespace Rtsp.Streaming.Video
 		}
 
 		[HttpGet]
-		[Route("{cam}/master.m3u8")]
-		public async Task<ActionResult> GetMasterPlaylist(string cam)
+		[Route("{cameraId:int}/master.m3u8")]
+		public async Task<ActionResult> GetMasterPlaylist(int cameraId)
 		{
-			var camera = await api.GetCamera(cam);
+			var camera = await api.GetCamera(cameraId);
 
 			if (camera == null)
 				return NotFound();
@@ -33,22 +33,22 @@ namespace Rtsp.Streaming.Video
 		}
 
 		[HttpGet]
-		[Route("{cam}/index.m3u8")]
-		public ActionResult GetPlaylist(string cam)
+		[Route("{cameraId:int}/index.m3u8")]
+		public ActionResult GetPlaylist(int cameraId)
 		{
-			videos.RecordCameraAccess(cam);
+			videos.RecordCameraAccess(cameraId);
 
-			string path = Path.Combine(opts.OutputPath, cam, "index.m3u8");
+			string path = Path.Combine(opts.OutputPath, cameraId.ToString(), "index.m3u8");
 			return File(System.IO.File.OpenRead(path), "application/vnd.apple.mpegurl");
 		}
 
 		[HttpGet]
-		[Route("{cam}/{name}.ts")]
-		public ActionResult GetParts(string cam, string name)
+		[Route("{cameraId:int}/{name}.ts")]
+		public ActionResult GetParts(int cameraId, string name)
 		{
-			videos.RecordCameraAccess(cam);
+			videos.RecordCameraAccess(cameraId);
 
-			string path = Path.Combine(opts.OutputPath, cam, $"{name}.ts");
+			string path = Path.Combine(opts.OutputPath, cameraId.ToString(), $"{name}.ts");
 			try
 			{
 				return File(System.IO.File.OpenRead(path), "video/mp2t");

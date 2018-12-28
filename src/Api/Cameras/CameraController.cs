@@ -26,8 +26,8 @@ namespace Rtsp.Cameras
 		}
 
 		[HttpGet]
-		[Route("{id}")]
-		public async Task<ActionResult<Camera>> GetCameraById(string id)
+		[Route("{id:int}")]
+		public async Task<ActionResult<Camera>> GetCameraById(int id)
 		{
 			var camera = await db.SelectCamera(id);
 
@@ -40,20 +40,21 @@ namespace Rtsp.Cameras
 		[HttpPost]
 		public async Task<ActionResult<Camera>> AddCamera(NewCamera camera)
 		{
+			int cameraId;
 			Camera result;
 
 			using (var tx = db.BeginTransaction())
 			{
 				try
 				{
-					await db.InsertCamera(camera);
+					cameraId = await db.InsertCamera(camera);
 				}
 				catch (SqlException ex) when (ex.IsDuplicateKeyException())
 				{
-					return Conflict(new { Message = $"A camera with ID '{camera.Id}' already exists." });
+					return Conflict(new { Message = $"A camera with ID '' already exists." });
 				}
 
-				result = await db.SelectCamera(camera.Id);
+				result = await db.SelectCamera(cameraId);
 
 				tx.Commit();
 			}
@@ -62,8 +63,8 @@ namespace Rtsp.Cameras
 		}
 
 		[HttpDelete]
-		[Route("{id}")]
-		public async Task<ActionResult> RemoveCamera(string id)
+		[Route("{id:int}")]
+		public async Task<ActionResult> RemoveCamera(int id)
 		{
 			int count = await db.DeleteCamera(id);
 

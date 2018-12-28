@@ -14,19 +14,8 @@ namespace Rtsp.Tests.Scenarios
 		{
 			await base.InitializeAsync();
 
-			await api.AddCamera(new Camera
-			{
-				Id = "cam1",
-				Name = "Front Yard",
-				RtspUrl = "rtsp://example.com/front"
-			});
-
-			await api.AddCamera(new Camera
-			{
-				Id = "cam2",
-				Name = "Backyard",
-				RtspUrl = "rtsp://example.com/back"
-			});
+			await api.AddCamera("Front Yard", "rtsp://example.com/front");
+			await api.AddCamera("Backyard", "rtsp://example.com/back");
 		}
 
 		[Fact]
@@ -43,19 +32,15 @@ namespace Rtsp.Tests.Scenarios
 			{
 				new Camera
 				{
-					Id = "cam1",
 					Name = "Front Yard",
-					Nicknames = new string[0],
 					RtspUrl = "rtsp://example.com/front"
 				},
 				new Camera
 				{
-					Id = "cam2",
 					Name = "Backyard",
-					Nicknames = new string[0],
 					RtspUrl = "rtsp://example.com/back"
 				}
-			});
+			}, opts => opts.Including(c => c.Name).Including(c => c.RtspUrl).WithStrictOrdering());
 		}
 	}
 }

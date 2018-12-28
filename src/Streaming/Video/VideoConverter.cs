@@ -15,8 +15,8 @@ namespace Rtsp.Streaming.Video
 		static readonly TimeSpan oldStreamThreshold = TimeSpan.FromMinutes(10);
 
 		readonly AsyncReaderWriterLock lck = new AsyncReaderWriterLock();
-		readonly Dictionary<string, Process> processes = new Dictionary<string, Process>();
-		readonly ConcurrentDictionary<string, DateTime> accessTimes = new ConcurrentDictionary<string, DateTime>();
+		readonly Dictionary<int, Process> processes = new Dictionary<int, Process>();
+		readonly ConcurrentDictionary<int, DateTime> accessTimes = new ConcurrentDictionary<int, DateTime>();
 		readonly StreamingOptions opts;
 		readonly ILogger log;
 
@@ -26,24 +26,24 @@ namespace Rtsp.Streaming.Video
 			this.log = log;
 		}
 
-		public async Task<string> StartVideoConversionAsync(string cam, string rtspUrl)
+		public async Task<string> StartVideoConversionAsync(int cameraId, string rtspUrl)
 		{
-			string camDir = Path.Combine(opts.OutputPath, cam);
+			string camDir = Path.Combine(opts.OutputPath, cameraId.ToString());
 			string masterPath = Path.Combine(camDir, "master.m3u8");
 			string playlistPath = Path.Combine(camDir, "index.m3u8");
 
 			using (await lck.ReaderLockAsync())
 			{
-				if (processes.ContainsKey(cam))
+				if (processes.ContainsKey(cameraId))
 					return masterPath;
 			}
 
 			using (await lck.WriterLockAsync())
 			{
-				if (processes.ContainsKey(cam))
+				if (processes.ContainsKey(cameraId))
 					return masterPath;
 
-				log.LogInformation("Starting camera stream for {cam}", cam);
+				log.LogInformation("Starting camera stream for {cameraId}", cameraId);
 
 				EnsureEmptyDirectory(camDir);
 				await WriteMasterPlaylistAsync(masterPath);
@@ -63,8 +63,8 @@ namespace Rtsp.Streaming.Video
 
 				process.Start();
 
-				processes.Add(cam, process);
-				accessTimes.TryAdd(cam, DateTime.Now);
+				processes.Add(cameraId, process);
+				accessTimes.TryAdd(cameraId, DateTime.Now);
 
 				while (!File.Exists(playlistPath))
 					await Task.Delay(500);
@@ -73,25 +73,25 @@ namespace Rtsp.Streaming.Video
 			return masterPath;
 		}
 
-		public void RecordCameraAccess(string cam)
+		public void RecordCameraAccess(int cameraId)
 		{
-			log.LogDebug("Recording camera access for {cam}", cam);
-			accessTimes[cam] = DateTime.Now;
+			log.LogDebug("Recording camera access for {cameraId}", cameraId);
+			accessTimes[cameraId] = DateTime.Now;
 		}
 
 		public void PurgeUnusedStreams()
 		{
-			var camsToKill = new List<string>();
+			var camsToKill = new List<int>();
 
 			using (lck.ReaderLock())
 			{
-				foreach (string cam in processes.Keys)
+				foreach (int cameraId in processes.Keys)
 				{
-					accessTimes.TryGetValue(cam, out DateTime lastAccessTime);
+					accessTimes.TryGetValue(cameraId, out DateTime lastAccessTime);
 					DateTime threshold = lastAccessTime.Add(oldStreamThreshold);
 
 					if (DateTime.Now > threshold)
-						camsToKill.Add(cam);
+						camsToKill.Add(cameraId);
 				}
 			}
 
@@ -101,16 +101,16 @@ namespace Rtsp.Streaming.Video
 
 				using (lck.WriterLock())
 				{
-					foreach (string cam in camsToKill)
+					foreach (int cameraId in camsToKill)
 					{
-						if (processes.TryGetValue(cam, out Process process))
+						if (processes.TryGetValue(cameraId, out Process process))
 						{
-							log.LogDebug("Purging {cam} camera stream", cam);
+							log.LogDebug("Purging {cameraId} camera stream", cameraId);
 							process.Kill();
 						}
 
-						processes.Remove(cam);
-						accessTimes.Remove(cam, out _);
+						processes.Remove(cameraId);
+						accessTimes.Remove(cameraId, out _);
 					}
 				}
 			}
